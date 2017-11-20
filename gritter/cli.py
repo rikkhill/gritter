@@ -12,6 +12,7 @@ def get_friends(user_list):
     auth = tweepy.OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
     auth.set_access_token(credentials["access_token"], credentials["access_secret"])
 
+    #auth = tweepy.AppAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
     api = tweepy.API(auth)
 
     #with click.progressbar(user_list) as user_bar:
