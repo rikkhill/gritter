@@ -1,5 +1,24 @@
 import click
+import tweepy
+import time
 import gritter.config as config
+
+CONF_PATH = click.get_app_dir("gritter") + "/.conf"
+
+
+def get_friends(user_list):
+
+    credentials = config.get_auth(CONF_PATH)
+    auth = tweepy.OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
+    auth.set_access_token(credentials["access_token"], credentials["access_secret"])
+
+    api = tweepy.API(auth)
+
+    #with click.progressbar(user_list) as user_bar:
+    for user in user_list:
+        print(api.friends_ids(user))
+
+    print(api.rate_limit_status()["resources"]["friends"])
 
 @click.group()
 def cli():
@@ -12,9 +31,7 @@ def cli():
 @click.option("--depth", default=1, type=int, help="Depth of connections to return (default 1)")
 def users(usernames, depth):
     """Provide a list of usernames to get the graph for."""
-    click.echo("Usernames:")
-    for user in usernames:
-        click.echo("\t%s" % user)
+    get_friends(usernames)
     click.echo("Depth %d" % depth)
 
 @cli.command()
@@ -28,13 +45,11 @@ def userfile(file):
 
 @cli.command()
 def authenticate():
-    conf_path = click.get_app_dir("gritter")
-    conf_path += "/.conf"
-    if config.has_config(conf_path):
+    if config.has_config(CONF_PATH):
         click.confirm("Authentication details are already set on this machine. Do you wish to overwrite them?",
                       abort=True)
 
-    config.create_config(conf_path)
+    config.create_config(CONF_PATH)
     click.echo("Please enter your Twitter API credentials")
 
     consumer_key = click.prompt("Consumer key")
@@ -49,14 +64,12 @@ def authenticate():
         "access_secret": access_secret,
     }
 
-    config.set_auth(conf_path, auth_args)
+    config.set_auth(CONF_PATH, auth_args)
 
 
 @cli.command()
 def show_auth():
     """Don't have this in the finished product!."""
-    conf_path = click.get_app_dir("gritter")
-    conf_path += "/.conf"
 
-    for k, v in config.get_auth(conf_path).items():
+    for k, v in config.get_auth(CONF_PATH).items():
         click.echo("%s: %s" % (k, v))
