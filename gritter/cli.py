@@ -12,7 +12,7 @@ def get_friends(user_list):
     auth = tweepy.OAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
     auth.set_access_token(credentials["access_token"], credentials["access_secret"])
 
-    #auth = tweepy.AppAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
+    auth = tweepy.AppAuthHandler(credentials["consumer_key"], credentials["consumer_secret"])
     api = tweepy.API(auth)
 
     #with click.progressbar(user_list) as user_bar:
@@ -35,6 +35,7 @@ def users(usernames, depth):
     get_friends(usernames)
     click.echo("Depth %d" % depth)
 
+
 @cli.command()
 @click.argument("file", type=click.File("r"))
 def userfile(file):
@@ -43,6 +44,7 @@ def userfile(file):
 
     for user in users:
         click.echo(user)
+
 
 @cli.command()
 def authenticate():
